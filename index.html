@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌱 Árbol de Hábitos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06060f;
+  --bg2: #0d0d1f;
+  --panel: #12122a;
+  --panel2: #1a1a38;
+  --border: #2a2a5a;
+  --border2: #3a3a7a;
+  --green: #00ff88;
+  --green2: #00cc66;
+  --green3: #00ff44;
+  --yellow: #ffdd00;
+  --orange: #ff8800;
+  --red: #ff2244;
+  --blue: #4488ff;
+  --cyan: #00eeff;
+  --purple: #bb44ff;
+  --pink: #ff44aa;
+  --white: #eeeeff;
+  --gray: #5566aa;
+  --gray2: #8899cc;
+  --xp: #ffcc00;
+  --accent: #00ff88;
+  --glow: rgba(0,255,136,0.3);
+
+  /* THEMES */
+  --th-primary: #00ff88;
+  --th-primary2: #00cc66;
+  --th-glow: rgba(0,255,136,0.3);
+  --th-leaf1: #2d8a1a;
+  --th-leaf2: #3daa2a;
+}
+
+/* THEME: BLUE NEON */
+body.theme-blue {
+  --th-primary: #4488ff;
+  --th-primary2: #2266dd;
+  --th-glow: rgba(68,136,255,0.35);
+  --green: #4488ff;
+  --green2: #2266dd;
+  --green3: #88aaff;
+  --glow: rgba(68,136,255,0.3);
+  --accent: #4488ff;
+}
+/* THEME: RED FIRE */
+body.theme-red {
+  --th-primary: #ff4422;
+  --th-primary2: #cc2200;
+  --th-glow: rgba(255,68,34,0.35);
+  --green: #ff4422;
+  --green2: #cc2200;
+  --green3: #ff6644;
+  --glow: rgba(255,68,34,0.3);
+  --accent: #ff4422;
+}
+/* THEME: GOLD */
+body.theme-gold {
+  --th-primary: #ffcc00;
+  --th-primary2: #ddaa00;
+  --th-glow: rgba(255,204,0,0.35);
+  --green: #ffcc00;
+  --green2: #ddaa00;
+  --green3: #ffee44;
+  --glow: rgba(255,204,0,0.3);
+  --accent: #ffcc00;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; image-rendering: pixelated; }
+
+body {
+  background: var(--bg);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+#stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle linear infinite; }
+@keyframes twinkle {
+  0%,100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+.aurora {
+  position: fixed; top: 0; left: 0; right: 0; height: 300px;
+  background: linear-gradient(180deg, rgba(0,255,136,0.04) 0%, rgba(68,136,255,0.02) 50%, transparent 100%);
+  pointer-events: none; z-index: 0;
+  animation: auroraShift 8s ease-in-out infinite;
+}
+@keyframes auroraShift { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* ─── LAYOUT ─── */
+#app {
+  position: relative; z-index: 1;
+  max-width: 960px; margin: 0 auto;
+  padding: 10px 14px 40px;
+}
+
+/* ─── HEADER ─── */
+header {
+  position: relative; text-align: center;
+  padding: 16px 0 12px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 12px;
+}
+.header-inner {
+  display: flex; align-items: center;
+  justify-content: center; gap: 10px; flex-wrap: wrap;
+}
+.logo-text {
+  font-size: 15px; color: var(--green);
+  text-shadow: 0 0 8px var(--green), 2px 2px 0 #003322;
+  animation: glow 2.5s ease-in-out infinite; cursor: pointer;
+}
+.logo-text:hover { text-decoration: underline; }
+@keyframes glow {
+  0%,100% { text-shadow: 0 0 6px var(--green), 2px 2px 0 #003322; }
+  50% { text-shadow: 0 0 18px var(--green), 0 0 35px var(--green2), 2px 2px 0 #003322; }
+}
+.player-name { font-size: 9px; color: var(--cyan); text-shadow: 0 0 8px var(--cyan); }
+.subtitle { font-family: 'VT323', monospace; font-size: 14px; color: var(--gray2); margin-top: 5px; letter-spacing: 1px; }
+.header-actions {
+  position: absolute; right: 0; top: 16px; display: flex; gap: 5px;
+}
+.icon-btn {
+  background: var(--panel); border: 2px solid var(--border); color: var(--gray2);
+  font-size: 13px; width: 30px; height: 30px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all 0.1s;
+}
+.icon-btn:hover { border-color: var(--green); color: var(--green); box-shadow: 0 0 8px var(--glow); }
+
+/* ─── NAV TABS (main) ─── */
+.main-nav {
+  display: flex; gap: 0; margin-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+}
+.main-nav::-webkit-scrollbar { height: 3px; }
+.main-nav::-webkit-scrollbar-thumb { background: var(--border2); }
+.mnav-tab {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--gray2); background: transparent;
+  border: none; border-bottom: 3px solid transparent;
+  padding: 7px 12px; cursor: pointer; margin-bottom: -2px;
+  transition: all 0.1s; white-space: nowrap;
+}
+.mnav-tab.active { color: var(--green); border-bottom-color: var(--green); }
+.mnav-tab:hover:not(.active) { color: var(--white); }
+.main-page { display: none; }
+.main-page.active { display: block; }
+
+/* ─── XP BAR ─── */
+.xp-bar-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--panel); border: 2px solid var(--border);
+  padding: 7px 10px; margin-bottom: 10px;
+}
+.xp-level { font-size: 7px; color: var(--xp); white-space: nowrap; min-width: 55px; }
+.xp-track {
+  flex: 1; height: 10px; background: #070712;
+  border: 2px solid var(--border); position: relative; overflow: hidden;
+}
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffaa00, #ffdd00);
+  transition: width 0.8s steps(20); position: relative;
+}
+.xp-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 4px, transparent 4px, transparent 8px);
+}
+.xp-label { font-size: 5px; color: var(--gray2); white-space: nowrap; min-width: 68px; text-align: right; }
+
+/* ─── DATE BAR ─── */
+.date-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--panel); border: 2px solid var(--border);
+  padding: 6px 10px; margin-bottom: 12px;
+}
+.date-bar .clock { color: var(--yellow); font-size: 15px; font-family: 'VT323', monospace; }
+.date-bar .day-label { color: var(--green); font-size: 13px; font-family: 'VT323', monospace; }
+.date-bar .date-right { color: var(--gray2); font-size: 13px; font-family: 'VT323', monospace; }
+
+/* ─── STREAK BANNER ─── */
+.streak-banner {
+  display: none; text-align: center;
+  background: linear-gradient(90deg, #2a1500, #1a0800, #2a1500);
+  border: 2px solid var(--orange); padding: 7px; margin-bottom: 12px;
+  font-size: 7px; color: var(--orange);
+  animation: streakPulse 1.5s ease-in-out infinite;
+}
+@keyframes streakPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(255,136,0,0.3); }
+  50% { box-shadow: 0 0 18px rgba(255,136,0,0.7); }
+}
+
+/* ─── MAIN GRID (HOME) ─── */
+.main-grid {
+  display: grid; grid-template-columns: 1fr 290px; gap: 12px;
+}
+
+/* TREE */
+.tree-viewport {
+  background: var(--panel); border: 3px solid var(--border);
+  position: relative; overflow: hidden; min-height: 340px;
+}
+.sky-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #040410 0%, #0b1230 40%, #0f1f10 70%, #0a160a 100%);
+}
+/* Dynamic sky */
+.sky-dawn { background: linear-gradient(180deg, #0a0416 0%, #2a1040 30%, #401028 60%, #0a1408 100%) !important; }
+.sky-day  { background: linear-gradient(180deg, #040814 0%, #0a1828 40%, #0a1e10 70%, #081208 100%) !important; }
+.sky-dusk { background: linear-gradient(180deg, #080410 0%, #1a0828 30%, #3a1010 60%, #0a0c08 100%) !important; }
+.sky-night{ background: linear-gradient(180deg, #040410 0%, #0b1230 40%, #0f1f10 70%, #0a160a 100%) !important; }
+
+.ground { position: absolute; bottom: 0; left: 0; right: 0; height: 52px; background: #162a08; border-top: 3px solid #244510; }
+.ground-detail { position: absolute; top: 3px; left: 0; right: 0; height: 3px; background: repeating-linear-gradient(90deg, #3a7a1a 0px, #3a7a1a 8px, transparent 8px, transparent 16px); }
+#treeCanvas { position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%); }
+@keyframes treePulse {
+  0%,100% { filter: drop-shadow(0 0 6px rgba(0,255,136,0.4)); }
+  50% { filter: drop-shadow(0 0 16px rgba(0,255,136,0.7)); }
+}
+#treeCanvas { animation: treePulse 3s ease-in-out infinite; }
+@keyframes deadFlicker { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+#treeCanvas.dead { animation: deadFlicker 0.5s infinite; filter: drop-shadow(0 0 6px rgba(255,34,68,0.5)); }
+.stage-badge {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.75); border: 2px solid var(--green);
+  padding: 3px 8px; font-size: 6px; color: var(--green); white-space: nowrap;
+  box-shadow: 0 0 8px var(--glow);
+}
+.weather-fx { position: absolute; inset: 0; pointer-events: none; }
+.raindrop {
+  position: absolute; width: 2px; background: rgba(68,170,255,0.5);
+  border-radius: 1px; animation: rain linear infinite;
+}
+@keyframes rain { from{transform:translateY(-20px);} to{transform:translateY(400px);} }
+
+/* PARTICLES */
+.particle {
+  position: fixed; width: 4px; height: 4px; pointer-events: none;
+  animation: floatUp 1.8s ease-out forwards; z-index: 1000;
+}
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-70px) scale(0.4); }
+}
+
+/* CONFETTI */
+.confetti-piece {
+  position: fixed; width: 8px; height: 8px; pointer-events: none;
+  animation: confettiFall linear forwards; z-index: 10001;
+  border-radius: 1px;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.stage-info {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px; background: var(--panel); border: 2px solid var(--border); margin-top: 8px;
+}
+.stage-icon { font-size: 22px; }
+.stage-text { font-size: 13px; color: var(--gray2); line-height: 1.4; font-family: 'VT323', monospace; }
+.msg-box {
+  background: var(--bg2); border: 2px solid var(--border);
+  padding: 7px 10px; color: var(--green); min-height: 28px;
+  line-height: 1.6; margin-top: 6px;
+  font-family: 'VT323', monospace; font-size: 14px;
+}
+
+/* PREDICTION BOX */
+.predict-box {
+  background: #0a0a1a; border: 1px solid var(--purple);
+  padding: 6px 8px; margin-top: 6px;
+  font-family: 'VT323', monospace; font-size: 13px; color: var(--purple); line-height: 1.4;
+}
+
+/* RIGHT PANEL */
+.right-panel { display: flex; flex-direction: column; gap: 8px; }
+.pixel-box { background: var(--panel); border: 2px solid var(--border); padding: 10px; }
+.pixel-box h3 {
+  font-size: 6px; color: var(--yellow); margin-bottom: 8px;
+  padding-bottom: 5px; border-bottom: 2px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* STAT ROWS */
+.stat-row { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+.stat-label { font-size: 5px; color: var(--gray2); width: 50px; flex-shrink: 0; }
+.bar-track { flex: 1; height: 9px; background: #07071a; border: 2px solid var(--border); position: relative; overflow: hidden; }
+.bar-fill { height: 100%; transition: width 0.7s steps(12); position: relative; }
+.bar-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0px, rgba(255,255,255,0.12) 4px, transparent 4px, transparent 8px);
+}
+.bar-val { font-size: 5px; color: var(--white); width: 24px; text-align: right; }
+
+/* HABITS */
+.habit-item {
+  background: #0c0c22; border: 2px solid var(--border);
+  padding: 7px; margin-bottom: 6px; cursor: pointer;
+  position: relative; overflow: hidden; transition: border-color 0.12s, box-shadow 0.12s;
+}
+.habit-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--border); transition: background 0.2s;
+}
+.habit-item:hover { border-color: var(--green2); }
+.habit-item:hover::before { background: var(--green); }
+.habit-item.done { border-color: var(--green2); background: #071a0f; }
+.habit-item.done::before { background: var(--green); }
+.habit-item.failed { border-color: var(--red); background: #1a0808; opacity: 0.65; }
+.habit-item.failed::before { background: var(--red); }
+.habit-item.skipped { border-color: var(--border); opacity: 0.5; }
+
+.habit-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 5px; }
+.habit-name { font-size: 6px; color: var(--white); flex: 1; }
+.habit-actions { display: flex; gap: 4px; align-items: center; }
+.habit-check {
+  width: 18px; height: 18px; border: 2px solid var(--border); background: #070712;
+  display: flex; align-items: center; justify-content: center; font-size: 10px;
+  cursor: pointer; flex-shrink: 0; transition: all 0.1s;
+}
+.habit-check:hover { border-color: var(--green); box-shadow: 0 0 6px var(--glow); }
+.habit-item.done .habit-check { background: var(--green2); border-color: var(--green); color: #fff; }
+.habit-del {
+  width: 15px; height: 15px; border: 2px solid transparent; background: transparent;
+  display: flex; align-items: center; justify-content: center; font-size: 8px;
+  cursor: pointer; color: var(--gray); flex-shrink: 0; transition: all 0.1s;
+}
+.habit-del:hover { color: var(--red); border-color: var(--red); }
+.habit-note-btn {
+  width: 15px; height: 15px; border: 2px solid transparent; background: transparent;
+  display: flex; align-items: center; justify-content: center; font-size: 9px;
+  cursor: pointer; color: var(--gray); flex-shrink: 0; transition: all 0.1s;
+}
+.habit-note-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+.habit-note-btn.has-note { color: var(--cyan); }
+
+.habit-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.habit-streak { font-size: 12px; color: var(--orange); font-family: 'VT323', monospace; }
+.habit-freq { font-size: 10px; color: var(--gray2); font-family: 'VT323', monospace; }
+.mini-track { height: 4px; background: #07071a; border: 1px solid var(--border); overflow: hidden; }
+.mini-fill { height: 100%; transition: width 0.5s steps(8); }
+
+/* BOSS CHALLENGE */
+.boss-box {
+  background: linear-gradient(135deg, #1a0a00, #2a0800);
+  border: 2px solid var(--orange); padding: 8px; margin-bottom: 8px;
+  animation: bossGlow 2s ease-in-out infinite;
+}
+@keyframes bossGlow {
+  0%,100% { box-shadow: 0 0 8px rgba(255,136,0,0.3); }
+  50% { box-shadow: 0 0 20px rgba(255,136,0,0.6); }
+}
+.boss-title { font-size: 6px; color: var(--orange); margin-bottom: 4px; }
+.boss-desc { font-family: 'VT323', monospace; font-size: 14px; color: var(--white); margin-bottom: 6px; line-height: 1.3; }
+.boss-done { opacity: 0.5; }
+
+/* BUTTONS */
+.pixel-btn {
+  background: var(--panel); border: 2px solid var(--green);
+  color: var(--green); font-family: 'Press Start 2P', monospace;
+  font-size: 6px; padding: 7px 10px; cursor: pointer;
+  width: 100%; text-transform: uppercase; letter-spacing: 1px;
+  transition: all 0.1s; position: relative;
+}
+.pixel-btn:hover { background: var(--green); color: #000; box-shadow: 0 0 14px var(--glow); }
+.pixel-btn:active { transform: scale(0.97); }
+.pixel-btn.danger { border-color: var(--red); color: var(--red); }
+.pixel-btn.danger:hover { background: var(--red); color: #fff; box-shadow: 0 0 14px rgba(255,34,68,0.5); }
+.pixel-btn.secondary { border-color: var(--border2); color: var(--gray2); }
+.pixel-btn.secondary:hover { background: var(--border2); color: var(--white); box-shadow: none; }
+.pixel-btn.sm { font-size: 5px; padding: 5px 8px; }
+.btn-row { display: flex; gap: 6px; margin-top: 12px; }
+.btn-row .pixel-btn { flex: 1; }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,8,0.88); z-index: 10000;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--bg2); border: 3px solid var(--green);
+  padding: 20px; width: 90%; max-width: 460px;
+  box-shadow: 0 0 40px var(--glow), inset 0 0 30px rgba(0,255,136,0.03);
+  max-height: 92vh; overflow-y: auto;
+  animation: modalIn 0.2s steps(4);
+}
+@keyframes modalIn { from{transform:scale(0.85);opacity:0;} to{transform:scale(1);opacity:1;} }
+.modal-box h2 { font-size: 9px; color: var(--green); margin-bottom: 16px; }
+.modal-box.danger-modal { border-color: var(--red); box-shadow: 0 0 40px rgba(255,34,68,0.25); }
+
+/* FORM */
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 5px; color: var(--gray2); margin-bottom: 5px; letter-spacing: 1px; }
+.pixel-input, .pixel-select {
+  width: 100%; background: #070712; border: 2px solid var(--border);
+  color: var(--white); font-family: 'Press Start 2P', monospace;
+  font-size: 7px; padding: 7px; outline: none; transition: border-color 0.1s;
+}
+.pixel-input:focus, .pixel-select:focus { border-color: var(--green); box-shadow: 0 0 8px var(--glow); }
+.pixel-select option { background: #070712; }
+textarea.pixel-input { resize: vertical; min-height: 60px; font-family: 'VT323', monospace; font-size: 14px; }
+
+.icon-grid { display: flex; gap: 5px; flex-wrap: wrap; }
+.icon-opt {
+  width: 34px; height: 34px; border: 2px solid var(--border); background: #070712;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; transition: all 0.1s;
+}
+.icon-opt.selected, .icon-opt:hover { border-color: var(--green); background: #001a0a; box-shadow: 0 0 6px var(--glow); }
+.color-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 3px; }
+.color-opt { width: 26px; height: 26px; border: 3px solid transparent; cursor: pointer; transition: all 0.1s; }
+.color-opt.selected, .color-opt:hover { border-color: var(--white); transform: scale(1.1); }
+
+/* NOTIFICATION */
+#notif {
+  position: fixed; top: 14px; right: 14px;
+  background: var(--panel); border: 2px solid var(--green);
+  padding: 9px 12px; font-size: 6px; color: var(--green);
+  z-index: 9997; display: none; max-width: 220px;
+  box-shadow: 0 0 20px var(--glow);
+  animation: slideIn 0.25s steps(4);
+  font-family: 'VT323', monospace; font-size: 14px; line-height: 1.4;
+}
+@keyframes slideIn { from{transform:translateX(110%);} to{transform:translateX(0);} }
+
+/* HISTORY DOTS */
+.history-row { margin-bottom: 7px; }
+.history-label { font-size: 11px; color: var(--gray2); margin-bottom: 2px; font-family: 'VT323', monospace; }
+.history-dots { display: flex; gap: 3px; }
+.dot { width: 10px; height: 10px; border: 1px solid var(--border); position: relative; cursor: pointer; }
+.dot.hit { background: var(--green2); box-shadow: 0 0 3px rgba(0,204,102,0.5); }
+.dot.miss { background: var(--red); opacity: 0.4; }
+.dot.future { background: #0a0a20; }
+.dot.skip { background: var(--gray); opacity: 0.3; }
+.dot:hover::after {
+  content: attr(title); position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  background: #000; border: 1px solid var(--border); padding: 2px 4px;
+  font-size: 9px; white-space: nowrap; color: var(--white); z-index: 100;
+  font-family: 'VT323', monospace;
+}
+
+/* ACHIEVEMENTS */
+.achievement-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px; border: 1px solid var(--border); background: #0a0a1e; margin-bottom: 5px;
+}
+.achievement-item.locked { opacity: 0.35; filter: grayscale(1); }
+.ach-icon { font-size: 16px; flex-shrink: 0; }
+.ach-info { flex: 1; }
+.ach-name { font-size: 5px; color: var(--yellow); margin-bottom: 2px; }
+.ach-desc { font-family: 'VT323', monospace; font-size: 11px; color: var(--gray2); }
+
+/* LEVEL UP */
+#levelUp {
+  display: none; position: fixed; inset: 0; z-index: 10002;
+  background: rgba(0,0,0,0.75); align-items: center; justify-content: center;
+}
+#levelUp.show { display: flex; }
+.levelup-box {
+  text-align: center; padding: 36px; border: 4px solid var(--yellow);
+  background: var(--bg2); box-shadow: 0 0 60px rgba(255,221,0,0.5);
+  animation: scaleIn 0.4s steps(6);
+}
+@keyframes scaleIn { from{transform:scale(0);} to{transform:scale(1);} }
+.levelup-title { font-size: 13px; color: var(--yellow); text-shadow: 0 0 20px var(--yellow); margin-bottom: 14px; }
+.levelup-sub { font-size: 7px; color: var(--white); }
+
+/* TABS (inner) */
+.tab-bar { display: flex; gap: 0; margin-bottom: 8px; border-bottom: 2px solid var(--border); }
+.tab {
+  font-family: 'Press Start 2P', monospace; font-size: 5px; color: var(--gray2);
+  background: transparent; border: none; border-bottom: 2px solid transparent;
+  padding: 5px 7px; cursor: pointer; margin-bottom: -2px; transition: all 0.1s;
+}
+.tab.active { color: var(--green); border-bottom-color: var(--green); }
+.tab:hover { color: var(--white); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #07071a; }
+::-webkit-scrollbar-thumb { background: var(--border2); }
+
+.empty-state {
+  text-align: center; padding: 14px 8px; font-size: 12px;
+  color: var(--gray); line-height: 2.2; font-family: 'VT323', monospace;
+}
+.daily-quote {
+  font-family: 'VT323', monospace; font-size: 13px; color: var(--gray2);
+  text-align: center; padding: 5px 10px; background: var(--panel);
+  border: 1px solid var(--border); margin-bottom: 12px;
+  border-left: 3px solid var(--purple); line-height: 1.4;
+}
+
+/* ─── STATS PAGE ─── */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.stat-card {
+  background: var(--panel); border: 2px solid var(--border);
+  padding: 12px; text-align: center;
+}
+.stat-card .big-num { font-size: 20px; color: var(--green); margin-bottom: 6px; font-family: 'VT323', monospace; }
+.stat-card .label { font-size: 5px; color: var(--gray2); }
+.week-analysis {
+  background: var(--panel); border: 2px solid var(--border);
+  padding: 10px; margin-bottom: 10px;
+}
+.week-analysis h3 { font-size: 6px; color: var(--yellow); margin-bottom: 10px; }
+.day-bars { display: flex; gap: 4px; align-items: flex-end; height: 60px; }
+.day-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.day-bar-wrap { flex: 1; width: 100%; background: #07071a; border: 1px solid var(--border); display: flex; align-items: flex-end; }
+.day-bar-fill { width: 100%; transition: height 0.5s; }
+.day-label { font-size: 10px; color: var(--gray2); font-family: 'VT323', monospace; }
+.day-pct { font-size: 9px; font-family: 'VT323', monospace; }
+.best-day-note { font-family: 'VT323', monospace; font-size: 14px; color: var(--cyan); padding: 6px; background: #070718; border: 1px solid var(--cyan); margin-top: 6px; }
+
+/* MONTHLY CALENDAR */
+.calendar-wrap { background: var(--panel); border: 2px solid var(--border); padding: 10px; }
+.calendar-wrap h3 { font-size: 6px; color: var(--yellow); margin-bottom: 8px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-header { font-size: 9px; color: var(--gray2); font-family: 'VT323', monospace; text-align: center; padding: 2px; }
+.cal-day {
+  aspect-ratio: 1; border: 1px solid var(--border); background: #07071a;
+  font-family: 'VT323', monospace; font-size: 10px; color: var(--gray);
+  display: flex; align-items: center; justify-content: center; position: relative;
+  cursor: default;
+}
+.cal-day.today { border-color: var(--yellow); color: var(--yellow); }
+.cal-day.perfect { background: var(--green2); color: #000; border-color: var(--green); }
+.cal-day.partial { background: #1a3a10; color: var(--green2); border-color: var(--green2); }
+.cal-day.miss { background: #1a0808; color: var(--red); opacity: 0.6; border-color: #440a0a; }
+.cal-day.empty { background: transparent; border: none; }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.cal-nav button { background: transparent; border: 1px solid var(--border); color: var(--gray2); font-family: 'VT323', monospace; font-size: 14px; padding: 2px 8px; cursor: pointer; }
+.cal-nav button:hover { border-color: var(--green); color: var(--green); }
+.cal-nav .cal-month { font-size: 6px; color: var(--yellow); }
+
+/* EXPORT/IMPORT */
+.io-section { background: var(--panel); border: 2px solid var(--border); padding: 10px; margin-bottom: 10px; }
+.io-section h3 { font-size: 6px; color: var(--yellow); margin-bottom: 8px; }
+
+/* THEME GRID */
+.theme-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme-btn {
+  padding: 8px 12px; border: 2px solid var(--border); background: var(--panel);
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  cursor: pointer; transition: all 0.1s; color: var(--gray2);
+}
+.theme-btn:hover, .theme-btn.active { border-color: var(--green); color: var(--green); box-shadow: 0 0 8px var(--glow); }
+
+/* RESPONSIVE */
+@media (max-width: 660px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .logo-text { font-size: 11px; }
+  .header-actions { position: static; margin-top: 8px; justify-content: center; }
+  .header-inner { flex-direction: column; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .mnav-tab { font-size: 5px; padding: 6px 8px; }
+}
+
+/* NOTIF REMINDER */
+.reminder-section { background: var(--panel); border: 2px solid var(--border); padding: 10px; margin-bottom: 10px; }
+.reminder-section h3 { font-size: 6px; color: var(--yellow); margin-bottom: 8px; }
+.reminder-row { display: flex; gap: 8px; align-items: center; }
+.time-input {
+  flex: 1; background: #070712; border: 2px solid var(--border);
+  color: var(--white); font-family: 'Press Start 2P', monospace;
+  font-size: 8px; padding: 6px; outline: none; color-scheme: dark;
+}
+.time-input:focus { border-color: var(--green); }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div class="aurora"></div>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="logo-text" onclick="openNameModal()" title="Haz clic para cambiar nombre">🌱 ÁRBOL DE HÁBITOS</div>
+      <span class="player-name" id="playerNameDisplay"></span>
+    </div>
+    <div class="subtitle" id="headerSubtitle">TUS HÁBITOS ALIMENTAN TU ÁRBOL · TU DISCIPLINA DECIDE SI CRECE</div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="openNameModal()" title="Cambiar nombre">✏️</button>
+      <button class="icon-btn" onclick="openAchModal()" title="Logros">🏆</button>
+      <button class="icon-btn" onclick="confirmReset()" title="Reiniciar datos">🗑</button>
+    </div>
+  </header>
+
+  <!-- DAILY QUOTE -->
+  <div class="daily-quote" id="dailyQuote"></div>
+
+  <!-- XP BAR -->
+  <div class="xp-bar-wrap">
+    <div class="xp-level" id="xpLevel">LV 1</div>
+    <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="xp-label" id="xpLabel">0 / 100 XP</div>
+  </div>
+
+  <!-- DATE BAR -->
+  <div class="date-bar">
+    <span class="day-label" id="dayLabel">DÍA 0</span>
+    <span class="clock" id="clock">00:00:00</span>
+    <span class="date-right" id="dateLabel">--/--/----</span>
+  </div>
+
+  <!-- STREAK BANNER -->
+  <div class="streak-banner" id="streakBanner">🔥 ¡RACHA EN LLAMAS! <span id="streakNum">0</span> DÍAS CONSECUTIVOS 🔥</div>
+
+  <!-- MAIN NAV -->
+  <div class="main-nav">
+    <button class="mnav-tab active" onclick="switchMainTab('home',this)">🌳 ÁRBOL</button>
+    <button class="mnav-tab" onclick="switchMainTab('stats',this)">📊 STATS</button>
+    <button class="mnav-tab" onclick="switchMainTab('calendar',this)">📅 CALENDARIO</button>
+    <button class="mnav-tab" onclick="switchMainTab('settings',this)">⚙️ OPCIONES</button>
+  </div>
+
+  <!-- ─── HOME PAGE ─── -->
+  <div class="main-page active" id="page-home">
+    <div class="main-grid">
+      <!-- LEFT -->
+      <div>
+        <div class="tree-viewport">
+          <div class="sky-gradient" id="skyGradient"></div>
+          <div class="weather-fx" id="weatherFx"></div>
+          <div class="stage-badge" id="stageBadge">✨ SEMILLA</div>
+          <canvas id="treeCanvas" width="200" height="280"></canvas>
+          <div class="ground"><div class="ground-detail"></div></div>
+        </div>
+        <div class="stage-info">
+          <span class="stage-icon" id="stageIcon">🌰</span>
+          <div class="stage-text" id="stageText">Planta tu primera semilla.<br>Completa hábitos para verla crecer.</div>
+        </div>
+        <div class="msg-box" id="treeMsg">▶ Bienvenido. Agrega tus primeros hábitos y comienza tu viaje.</div>
+        <div class="predict-box" id="predictBox" style="display:none"></div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="right-panel">
+        <!-- STATS -->
+        <div class="pixel-box">
+          <h3>📊 ESTADÍSTICAS</h3>
+          <div class="stat-row">
+            <span class="stat-label">SALUD</span>
+            <div class="bar-track"><div class="bar-fill" id="healthBar" style="width:100%;background:var(--green)"></div></div>
+            <span class="bar-val" id="healthVal">100%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">PROGRESO</span>
+            <div class="bar-track"><div class="bar-fill" id="progressBar" style="width:0%;background:var(--blue)"></div></div>
+            <span class="bar-val" id="progressVal">0%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">RACHA</span>
+            <div class="bar-track"><div class="bar-fill" id="streakBar" style="width:0%;background:var(--orange)"></div></div>
+            <span class="bar-val" id="streakVal">0d</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">HOY</span>
+            <div class="bar-track"><div class="bar-fill" id="todayBar" style="width:0%;background:var(--cyan)"></div></div>
+            <span class="bar-val" id="todayVal">0%</span>
+          </div>
+        </div>
+
+        <!-- BOSS DEL DÍA -->
+        <div id="bossBox" style="display:none"></div>
+
+        <!-- HABITS -->
+        <div class="pixel-box" style="flex:1">
+          <h3>🎯 MIS HÁBITOS
+            <span style="font-size:5px;color:var(--gray2)" id="habitCount">0/0</span>
+          </h3>
+          <div id="habitsList"></div>
+          <button class="pixel-btn" onclick="openModal()" style="margin-top:5px">+ NUEVO HÁBITO</button>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="pixel-box">
+          <div class="tab-bar">
+            <button class="tab active" onclick="switchTab('history',this)">📅 HISTORIAL</button>
+            <button class="tab" onclick="switchTab('weekly',this)">📈 SEMANAL</button>
+          </div>
+          <div class="tab-pane active" id="tab-history"><div id="historyGrid"></div></div>
+          <div class="tab-pane" id="tab-weekly"><div id="weeklyGrid"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STATS PAGE ─── -->
+  <div class="main-page" id="page-stats">
+    <div class="stats-grid" id="statsCards"></div>
+    <div class="week-analysis pixel-box">
+      <h3>🧠 MEJOR DÍA DE LA SEMANA</h3>
+      <div class="day-bars" id="dayBars"></div>
+      <div class="best-day-note" id="bestDayNote">Completa algunos hábitos para ver tu análisis.</div>
+    </div>
+    <div class="pixel-box" style="margin-bottom:10px">
+      <h3>📈 HISTORIAL COMPLETO (7 DÍAS)</h3>
+      <div id="fullHistoryGrid"></div>
+    </div>
+  </div>
+
+  <!-- ─── CALENDAR PAGE ─── -->
+  <div class="main-page" id="page-calendar">
+    <div class="calendar-wrap">
+      <div class="cal-nav">
+        <button onclick="calPrev()">◀</button>
+        <span class="cal-month" id="calMonth">MAYO 2025</span>
+        <button onclick="calNext()">▶</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div style="margin-top:8px;font-family:'VT323',monospace;font-size:13px;color:var(--gray2);background:var(--panel);border:1px solid var(--border);padding:8px;">
+      🟩 Día perfecto &nbsp; 🟨 Parcial &nbsp; 🟥 Sin hábitos &nbsp; ⬛ Sin datos
+    </div>
+  </div>
+
+  <!-- ─── SETTINGS PAGE ─── -->
+  <div class="main-page" id="page-settings">
+
+    <!-- TEMAS -->
+    <div class="io-section">
+      <h3>🎨 TEMA DE COLOR</h3>
+      <div class="theme-grid">
+        <button class="theme-btn active" onclick="setTheme('green',this)">🌿 VERDE</button>
+        <button class="theme-btn" onclick="setTheme('blue',this)">💙 AZUL NEÓN</button>
+        <button class="theme-btn" onclick="setTheme('red',this)">🔥 ROJO FUEGO</button>
+        <button class="theme-btn" onclick="setTheme('gold',this)">⭐ DORADO</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div class="reminder-section">
+      <h3>🔔 RECORDATORIO DIARIO</h3>
+      <p style="font-family:'VT323',monospace;font-size:13px;color:var(--gray2);margin-bottom:8px;line-height:1.4;">
+        Activa las notificaciones del navegador para recibir un recordatorio a la hora que elijas.
+      </p>
+      <div class="reminder-row">
+        <input type="time" class="time-input" id="reminderTime" value="20:00">
+        <button class="pixel-btn sm" style="width:auto;white-space:nowrap" onclick="saveReminder()">✓ GUARDAR</button>
+        <button class="pixel-btn sm secondary" style="width:auto;white-space:nowrap" onclick="testReminder()">🔔 TEST</button>
+      </div>
+      <div id="reminderStatus" style="font-family:'VT323',monospace;font-size:12px;color:var(--gray2);margin-top:6px;"></div>
+    </div>
+
+    <!-- EXPORT / IMPORT -->
+    <div class="io-section">
+      <h3>💾 EXPORTAR / IMPORTAR</h3>
+      <p style="font-family:'VT323',monospace;font-size:13px;color:var(--gray2);margin-bottom:8px;line-height:1.4;">
+        Guarda tu progreso en un archivo JSON para no perderlo si cambias de navegador.
+      </p>
+      <div class="btn-row" style="margin-top:0">
+        <button class="pixel-btn sm" onclick="exportData()">⬇ EXPORTAR</button>
+        <button class="pixel-btn sm secondary" onclick="document.getElementById('importFile').click()">⬆ IMPORTAR</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+
+    <!-- SONIDOS -->
+    <div class="io-section">
+      <h3>🔊 SONIDOS 8-BIT</h3>
+      <div style="display:flex;align-items:center;gap:10px;font-family:'VT323',monospace;font-size:14px;color:var(--gray2);">
+        <span>Sonidos activados:</span>
+        <button id="soundToggle" class="pixel-btn sm" style="width:auto" onclick="toggleSound()">🔊 ON</button>
+      </div>
+    </div>
+
+    <!-- RESET -->
+    <div class="io-section">
+      <h3 style="color:var(--red)">⚠ ZONA PELIGROSA</h3>
+      <button class="pixel-btn danger sm" onclick="confirmReset()">🗑 REINICIAR TODO EL PROGRESO</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ─── MODALS ─── -->
+
+<!-- ADD HABIT -->
+<div class="modal-overlay" id="habitModal">
+  <div class="modal-box">
+    <h2>🌱 NUEVO HÁBITO</h2>
+    <div class="form-group">
+      <label>NOMBRE DEL HÁBITO</label>
+      <input class="pixel-input" id="habitName" placeholder="Ej: Hacer ejercicio" maxlength="26">
+    </div>
+    <div class="form-group">
+      <label>ICONO</label>
+      <div class="icon-grid" id="iconGrid"></div>
+    </div>
+    <div class="form-group">
+      <label>COLOR</label>
+      <div class="color-grid" id="colorGrid"></div>
+    </div>
+    <div class="form-group">
+      <label>FRECUENCIA</label>
+      <select class="pixel-select" id="habitFreq">
+        <option value="daily">Todos los días</option>
+        <option value="3pw">3 veces por semana</option>
+        <option value="4pw">4 veces por semana</option>
+        <option value="weekly">1 vez por semana</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>DURACIÓN TOTAL</label>
+      <select class="pixel-select" id="habitDuration">
+        <option value="7">1 semana (7 días)</option>
+        <option value="30">1 mes (30 días)</option>
+        <option value="90">3 meses (90 días)</option>
+        <option value="180">6 meses (180 días)</option>
+        <option value="365">1 año (365 días)</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="pixel-btn danger" onclick="closeModal()">✕ CANCELAR</button>
+      <button class="pixel-btn" onclick="saveHabit()">✓ GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal-box">
+    <h2>📝 NOTA DEL DÍA</h2>
+    <div class="form-group">
+      <label id="noteHabitLabel">HÁBITO</label>
+      <textarea class="pixel-input" id="noteText" placeholder="¿Cómo te fue hoy con este hábito?..." maxlength="200"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="pixel-btn danger" onclick="closeNoteModal()">✕ CERRAR</button>
+      <button class="pixel-btn" onclick="saveNote()">✓ GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAME MODAL -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal-box">
+    <h2>✏ TU NOMBRE</h2>
+    <div class="form-group">
+      <label>¿CÓMO TE LLAMAS, AVENTURERO?</label>
+      <input class="pixel-input" id="playerNameInput" placeholder="Tu nombre..." maxlength="20">
+    </div>
+    <div class="form-group">
+      <label>NOMBRE DE TU ÁRBOL</label>
+      <input class="pixel-input" id="treeName" placeholder="Árbol de la Victoria..." maxlength="24">
+    </div>
+    <div class="btn-row">
+      <button class="pixel-btn danger" onclick="closeNameModal()">✕ CANCELAR</button>
+      <button class="pixel-btn" onclick="saveName()">✓ GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS MODAL -->
+<div class="modal-overlay" id="achModal">
+  <div class="modal-box">
+    <h2>🏆 LOGROS</h2>
+    <div id="achList"></div>
+    <div class="btn-row"><button class="pixel-btn secondary" onclick="closeAchModal()">✕ CERRAR</button></div>
+  </div>
+</div>
+
+<!-- RESET CONFIRM -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal-box danger-modal">
+    <h2 style="color:var(--red)">⚠ REINICIAR TODO</h2>
+    <p style="font-size:6px;color:var(--gray2);line-height:2;margin-bottom:14px">Esta acción borrará TODOS tus hábitos y progreso. ¿Estás seguro?</p>
+    <div class="btn-row">
+      <button class="pixel-btn secondary" onclick="closeResetModal()">✕ CANCELAR</button>
+      <button class="pixel-btn danger" onclick="doReset()">✓ SÍ, BORRAR TODO</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div id="levelUp">
+  <div class="levelup-box">
+    <div class="levelup-title">⬆ ¡NIVEL <span id="newLevel">2</span>!</div>
+    <div class="levelup-sub">¡SUBISTE DE NIVEL!</div>
+    <div style="margin-top:16px;font-size:5px;color:var(--gray2)">Haz clic para continuar</div>
+  </div>
+</div>
+
+<div id="notif"></div>
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const ICONS = ['💪','🥗','💧','📚','🧘','💰','😴','🏃','🎨','✍️','🎸','🧹','❤️','🧠','🚫','🌅','🥤','🍎','🎯','🏋️','🌿','☀️','🧊','🎮','✈️','🐾'];
+const COLORS = ['#00ff88','#4488ff','#ff8800','#ff44aa','#bb44ff','#00eeff','#ffdd00','#ff2244'];
+let selectedIcon = ICONS[0];
+let selectedColor = COLORS[0];
+
+const STAGES = [
+  { min: 0,   max: 5,   label: 'SEMILLA',        icon: '🌰', desc: 'Planta tu primera semilla.\nCompleta hábitos para verla crecer.' },
+  { min: 6,   max: 15,  label: 'BROTE',           icon: '🌱', desc: 'Los primeros brotes aparecen.\n¡Sigue así, la constancia es clave!' },
+  { min: 16,  max: 30,  label: 'PLANTA JOVEN',    icon: '🌿', desc: 'Una rutina estable. Tu planta\ncomienza a tomar forma.' },
+  { min: 31,  max: 55,  label: 'PLANTA FUERTE',   icon: '🌲', desc: 'Gran disciplina. El árbol crece\ncon fuerza y determinación.' },
+  { min: 56,  max: 80,  label: 'ÁRBOL GRANDE',    icon: '🌳', desc: '¡Objetivo casi cumplido!\nEres un ejemplo de constancia.' },
+  { min: 81,  max: 100, label: 'ÁRBOL LEGENDARIO',icon: '✨', desc: '¡LEYENDA! Tu árbol es magnífico.\nHas dominado tus hábitos.' },
+];
+
+const XP_PER_LEVEL = 100;
+const XP_PER_HABIT = 25;
+
+const ACHIEVEMENTS = [
+  { id: 'first',   icon: '🌱', name: 'PRIMER PASO',      desc: 'Completa tu primer hábito',         check: d => d.habits.some(h => Object.values(h.log).filter(v=>v===true).length >= 1) },
+  { id: 'week',    icon: '📅', name: '7 DÍAS',            desc: 'Mantén una racha de 7 días',        check: (d,s) => s.streak >= 7 },
+  { id: 'month',   icon: '🗓', name: '30 DÍAS',           desc: 'Mantén una racha de 30 días',       check: (d,s) => s.streak >= 30 },
+  { id: 'five',    icon: '⭐', name: 'COLECCIONISTA',     desc: 'Agrega 5 hábitos diferentes',       check: d => d.habits.length >= 5 },
+  { id: 'perfect', icon: '💯', name: 'DÍA PERFECTO',      desc: 'Completa todos los hábitos del día',check: (d,s) => s.todayPct >= 100 },
+  { id: 'legendary',icon:'🏆', name: 'ÁRBOL LEGENDARIO',  desc: 'Llega al 81% de progreso',          check: (d,s) => s.progress >= 81 },
+  { id: 'lv5',     icon: '🎮', name: 'JUGADOR LV 5',      desc: 'Alcanza el nivel 5',                check: (d,s) => s.level >= 5 },
+  { id: 'streak3', icon: '🔥', name: 'EN LLAMAS',         desc: '3 días de racha',                   check: (d,s) => s.streak >= 3 },
+  { id: 'notes5',  icon: '📝', name: 'CRONISTA',          desc: 'Escribe 5 notas',                   check: d => countNotes(d) >= 5 },
+];
+
+const QUOTES = [
+  '"Somos lo que hacemos repetidamente." — Aristóteles',
+  '"Una pequeña acción diaria es mejor que ninguna." — Anónimo',
+  '"La disciplina es la libertad." — Epicteto',
+  '"El éxito es la suma de pequeños esfuerzos repetidos." — R. Collier',
+  '"No te rindas. El árbol más grande empezó como semilla." — Anónimo',
+  '"Cada día es una nueva oportunidad para mejorar." — Anónimo',
+  '"Los hábitos son el interés compuesto de la superación." — J. Clear',
+  '"Primero formas tus hábitos, luego tus hábitos te forman." — J. Dryden',
+];
+
+const BOSS_CHALLENGES = [
+  { text: '¡BOSS: Completa TODOS tus hábitos antes de las 20:00!', xp: 50 },
+  { text: '¡BOSS: Sin saltarte ningún hábito HOY!', xp: 50 },
+  { text: '¡BOSS: Haz tus hábitos en el primer intento del día!', xp: 40 },
+  { text: '¡BOSS: Completa 3 hábitos antes del mediodía!', xp: 45 },
+  { text: '¡BOSS: Día perfecto — 100% de cumplimiento!', xp: 60 },
+  { text: '¡BOSS: Escribe una nota en al menos un hábito hoy!', xp: 30 },
+];
+
+// Sound toggle
+let soundEnabled = true;
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggle').textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
+  const data = loadData(); data.soundEnabled = soundEnabled; saveData(data);
+}
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'check') {
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.08);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.16);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(); osc.stop(ctx.currentTime + 0.35);
+    } else if (type === 'level') {
+      osc.type = 'square';
+      [392, 523, 659, 784, 1047].forEach((f, i) => {
+        osc.frequency.setValueAtTime(f, ctx.currentTime + i * 0.12);
+      });
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      osc.start(); osc.stop(ctx.currentTime + 0.7);
+    } else if (type === 'achieve') {
+      osc.type = 'triangle';
+      [523, 784, 1047, 1319].forEach((f, i) => {
+        osc.frequency.setValueAtTime(f, ctx.currentTime + i * 0.1);
+      });
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.start(); osc.stop(ctx.currentTime + 0.6);
+    } else if (type === 'perfect') {
+      osc.type = 'square';
+      [523,659,784,659,784,1047].forEach((f,i)=>{
+        osc.frequency.setValueAtTime(f, ctx.currentTime + i*0.09);
+      });
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+      osc.start(); osc.stop(ctx.currentTime + 0.8);
+    }
+  } catch(e) {}
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem('habitTree3') || '{"habits":[],"startDate":null,"xp":0,"level":1,"achievements":[],"playerName":"","treeName":"","notes":{},"soundEnabled":true,"theme":"green","reminderTime":"","bossDate":"","bossDone":false}');
+  } catch(e) {
+    return { habits: [], startDate: null, xp: 0, level: 1, achievements: [], playerName: '', treeName: '', notes: {}, soundEnabled: true, theme: 'green', reminderTime: '', bossDate: '', bossDone: false };
+  }
+}
+function saveData(d) { localStorage.setItem('habitTree3', JSON.stringify(d)); }
+function getTodayStr() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+}
+function getStartDate(data) {
+  if (!data.startDate) { data.startDate = getTodayStr(); saveData(data); }
+  return data.startDate;
+}
+function daysDiff(a, b) { return Math.floor((new Date(b) - new Date(a)) / 86400000); }
+function shouldDoToday(habit, todayStr) {
+  const dow = new Date(todayStr + 'T12:00:00').getDay();
+  if (habit.freq === 'daily') return true;
+  if (habit.freq === '3pw') return [1,3,5].includes(dow);
+  if (habit.freq === '4pw') return [1,2,4,6].includes(dow);
+  if (habit.freq === 'weekly') return dow === 1;
+  return true;
+}
+function countNotes(d) {
+  if (!d.notes) return 0;
+  return Object.keys(d.notes).length;
+}
+
+// ─── COMPUTE STATS ───────────────────────────────────────────────────────────
+function computeStats(data) {
+  if (!data.habits.length) return { health: 100, progress: 0, streak: 0, todayPct: 0, level: data.level || 1, xpInLevel: data.xp || 0 };
+  const today = getTodayStr();
+  let totalProg = 0;
+  data.habits.forEach(h => {
+    const hits = Object.values(h.log).filter(v => v === true).length;
+    totalProg += Math.min(100, hits / h.duration * 100);
+  });
+  const progress = Math.round(totalProg / data.habits.length);
+  let streak = 0;
+  let d = new Date(today + 'T12:00:00');
+  while (streak < 999) {
+    const ds = d.toISOString().split('T')[0];
+    const anyDone = data.habits.some(h => h.log[ds] === true);
+    if (anyDone) { streak++; d.setDate(d.getDate()-1); } else break;
+  }
+  let health = 100;
+  const dueToday = data.habits.filter(h => shouldDoToday(h, today));
+  let todayPct = 0;
+  if (dueToday.length) {
+    const doneCount = dueToday.filter(h => h.log[today] === true).length;
+    todayPct = Math.round(doneCount / dueToday.length * 100);
+    health = Math.max(0, Math.round(50 + (todayPct/100) * 50));
+    for (let i = 1; i <= 3; i++) {
+      const dd = new Date(today + 'T12:00:00');
+      dd.setDate(dd.getDate()-i);
+      const ds = dd.toISOString().split('T')[0];
+      let misses = 0;
+      data.habits.forEach(h => { if (shouldDoToday(h, ds) && h.log[ds] !== true) misses++; });
+      health = Math.max(10, health - misses * 4);
+    }
+  }
+  const totalXP = data.xp || 0;
+  const level = Math.floor(totalXP / XP_PER_LEVEL) + 1;
+  const xpInLevel = totalXP % XP_PER_LEVEL;
+  return { health, progress, streak, todayPct, level, xpInLevel };
+}
+
+// ─── RENDER STATS ─────────────────────────────────────────────────────────────
+function renderStats(data) {
+  const { health, progress, streak, todayPct, level, xpInLevel } = computeStats(data);
+  document.getElementById('healthBar').style.width = health + '%';
+  document.getElementById('healthBar').style.background = health > 60 ? 'var(--green)' : health > 30 ? 'var(--orange)' : 'var(--red)';
+  document.getElementById('healthVal').textContent = health + '%';
+  document.getElementById('progressBar').style.width = progress + '%';
+  document.getElementById('progressVal').textContent = progress + '%';
+  document.getElementById('streakBar').style.width = Math.min(100, streak/30*100) + '%';
+  document.getElementById('streakVal').textContent = streak + 'd';
+  document.getElementById('todayBar').style.width = todayPct + '%';
+  document.getElementById('todayVal').textContent = todayPct + '%';
+  document.getElementById('xpLevel').textContent = `LV ${level}`;
+  document.getElementById('xpFill').style.width = xpInLevel + '%';
+  document.getElementById('xpLabel').textContent = `${xpInLevel} / ${XP_PER_LEVEL} XP`;
+  const banner = document.getElementById('streakBanner');
+  if (streak >= 3) { banner.style.display = 'block'; document.getElementById('streakNum').textContent = streak; }
+  else { banner.style.display = 'none'; }
+  const today = getTodayStr();
+  const due = data.habits.filter(h => shouldDoToday(h, today));
+  const done = due.filter(h => h.log[today] === true);
+  document.getElementById('habitCount').textContent = `${done.length}/${due.length}`;
+}
+
+// ─── STAGE ─────────────────────────────────────────────────────────────────────
+function getStage(progress) { return STAGES.find(s => progress >= s.min && progress <= s.max) || STAGES[0]; }
+function renderStage(data) {
+  const { progress, health, streak } = computeStats(data);
+  const stage = getStage(progress);
+  document.getElementById('stageBadge').textContent = `${stage.icon} ${stage.label}`;
+  document.getElementById('stageIcon').textContent = stage.icon;
+  document.getElementById('stageText').innerHTML = stage.desc.replace('\n','<br>');
+  const msgs = health > 70
+    ? ['▶ El árbol florece con tu disciplina.', '▶ ¡Sigue así! Cada día cuenta.', '▶ Tu constancia da frutos.', '▶ Eres imparable. El árbol lo siente.']
+    : health > 40
+    ? ['▶ El árbol necesita más atención.', '▶ Algunos hábitos sin completar hoy.', '▶ No te rindas, ¡aún puedes!']
+    : ['▶ El árbol se debilita. ¡Actúa ya!', '▶ PELIGRO: recupera tu árbol hoy.'];
+  document.getElementById('treeMsg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+
+  // Prediction
+  const pred = document.getElementById('predictBox');
+  if (streak > 0) {
+    const tomorrow = streak + 1;
+    const milestones = [3,7,14,21,30,60,90];
+    const next = milestones.find(m => m > streak);
+    if (next) {
+      pred.style.display = 'block';
+      pred.textContent = `🔮 Si completas hoy → ${tomorrow}d de racha. ¡A ${next-streak} día${next-streak>1?'s':''} del hito ${next}! 🔥`;
+    } else { pred.style.display = 'none'; }
+  } else { pred.style.display = 'none'; }
+
+  return { stage, progress, health };
+}
+
+// ─── DYNAMIC SKY ─────────────────────────────────────────────────────────────
+function updateSky() {
+  const h = new Date().getHours();
+  const sky = document.getElementById('skyGradient');
+  sky.className = 'sky-gradient';
+  if (h >= 5 && h < 8) sky.classList.add('sky-dawn');
+  else if (h >= 8 && h < 18) sky.classList.add('sky-day');
+  else if (h >= 18 && h < 21) sky.classList.add('sky-dusk');
+  else sky.classList.add('sky-night');
+}
+
+// ─── PLAYER NAME ─────────────────────────────────────────────────────────────
+function updateNameDisplay() {
+  const data = loadData();
+  const nameEl = document.getElementById('playerNameDisplay');
+  nameEl.textContent = data.playerName ? '· ' + data.playerName.toUpperCase() : '';
+  if (data.treeName) document.getElementById('headerSubtitle').textContent = `"${data.treeName.toUpperCase()}" · TU DISCIPLINA DECIDE SI CRECE`;
+}
+function openNameModal() {
+  const data = loadData();
+  document.getElementById('playerNameInput').value = data.playerName || '';
+  document.getElementById('treeName').value = data.treeName || '';
+  document.getElementById('nameModal').classList.add('open');
+}
+function closeNameModal() { document.getElementById('nameModal').classList.remove('open'); }
+function saveName() {
+  const data = loadData();
+  data.playerName = document.getElementById('playerNameInput').value.trim();
+  data.treeName = document.getElementById('treeName').value.trim();
+  saveData(data); updateNameDisplay(); closeNameModal();
+  showNotif(`✅ ¡Bienvenido, ${data.playerName || 'Aventurero'}!`, 'green');
+}
+
+// ─── ACHIEVEMENTS ────────────────────────────────────────────────────────────
+function openAchModal() {
+  const data = loadData(); const stats = computeStats(data);
+  const list = document.getElementById('achList'); list.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = a.check(data, stats);
+    const div = document.createElement('div');
+    div.className = 'achievement-item' + (unlocked ? '' : ' locked');
+    div.innerHTML = `<span class="ach-icon">${a.icon}</span>
+      <div class="ach-info"><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
+      <span style="font-size:10px;color:${unlocked?'var(--green)':'var(--gray)'}">${unlocked?'✓':'🔒'}</span>`;
+    list.appendChild(div);
+  });
+  document.getElementById('achModal').classList.add('open');
+}
+function closeAchModal() { document.getElementById('achModal').classList.remove('open'); }
+function checkAchievements(data) {
+  const stats = computeStats(data);
+  ACHIEVEMENTS.forEach(a => {
+    if (!data.achievements.includes(a.id) && a.check(data, stats)) {
+      data.achievements.push(a.id); saveData(data);
+      setTimeout(() => { showNotif(`🏆 LOGRO: ${a.name}!`, 'yellow'); playSound('achieve'); }, 600);
+    }
+  });
+}
+
+// ─── RESET ───────────────────────────────────────────────────────────────────
+function confirmReset() { document.getElementById('resetModal').classList.add('open'); }
+function closeResetModal() { document.getElementById('resetModal').classList.remove('open'); }
+function doReset() {
+  localStorage.removeItem('habitTree3'); closeResetModal();
+  showNotif('🗑 Datos borrados. Nuevo comienzo.', 'red'); render(); updateNameDisplay();
+}
+
+// ─── CLOCK ───────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+  document.getElementById('dateLabel').textContent = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+  const data = loadData();
+  const start = getStartDate(data);
+  document.getElementById('dayLabel').textContent = `DÍA ${daysDiff(start, getTodayStr()) + 1}`;
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ─── STARS ───────────────────────────────────────────────────────────────────
+(function() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div'); s.className = 'star';
+    const size = Math.random() < 0.7 ? 1 : 2;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*65}%;animation-delay:${Math.random()*4}s;animation-duration:${1.5+Math.random()*3}s`;
+    c.appendChild(s);
+  }
+})();
+
+// ─── DAILY QUOTE ─────────────────────────────────────────────────────────────
+(function() {
+  const idx = new Date().getDate() % QUOTES.length;
+  document.getElementById('dailyQuote').textContent = '💬 ' + QUOTES[idx];
+})();
+
+// ─── ICON/COLOR GRIDS ────────────────────────────────────────────────────────
+function buildIconGrid() {
+  const g = document.getElementById('iconGrid'); g.innerHTML = '';
+  ICONS.forEach(ic => {
+    const d = document.createElement('div');
+    d.className = 'icon-opt' + (ic === selectedIcon ? ' selected' : '');
+    d.textContent = ic; d.onclick = () => { selectedIcon = ic; buildIconGrid(); };
+    g.appendChild(d);
+  });
+}
+function buildColorGrid() {
+  const g = document.getElementById('colorGrid'); g.innerHTML = '';
+  COLORS.forEach(col => {
+    const d = document.createElement('div');
+    d.className = 'color-opt' + (col === selectedColor ? ' selected' : '');
+    d.style.background = col; d.style.boxShadow = col === selectedColor ? `0 0 8px ${col}` : 'none';
+    d.onclick = () => { selectedColor = col; buildColorGrid(); };
+    g.appendChild(d);
+  });
+}
+buildIconGrid(); buildColorGrid();
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('habitModal').classList.add('open');
+  document.getElementById('habitName').value = '';
+  selectedIcon = ICONS[0]; selectedColor = COLORS[0];
+  buildIconGrid(); buildColorGrid();
+}
+function closeModal() { document.getElementById('habitModal').classList.remove('open'); }
+
+function saveHabit() {
+  const name = document.getElementById('habitName').value.trim();
+  if (!name) { showNotif('⚠ Ingresa un nombre!', 'red'); return; }
+  const data = loadData(); getStartDate(data);
+  data.habits.push({
+    id: Date.now(), name, icon: selectedIcon, color: selectedColor,
+    freq: document.getElementById('habitFreq').value,
+    duration: parseInt(document.getElementById('habitDuration').value),
+    createdAt: getTodayStr(), log: {},
+  });
+  saveData(data); closeModal();
+  showNotif(`✅ "${name}" agregado! +${XP_PER_HABIT} XP`, 'green');
+  addXP(data, XP_PER_HABIT); render();
+}
+
+// ─── NOTE MODAL ──────────────────────────────────────────────────────────────
+let noteHabitId = null;
+function openNoteModal(id) {
+  const data = loadData();
+  const h = data.habits.find(x => x.id === id);
+  if (!h) return;
+  noteHabitId = id;
+  const today = getTodayStr();
+  const key = `${id}_${today}`;
+  document.getElementById('noteHabitLabel').textContent = `${h.icon} ${h.name.toUpperCase()} — HOY`;
+  document.getElementById('noteText').value = (data.notes && data.notes[key]) || '';
+  document.getElementById('noteModal').classList.add('open');
+}
+function closeNoteModal() { document.getElementById('noteModal').classList.remove('open'); noteHabitId = null; }
+function saveNote() {
+  if (!noteHabitId) return;
+  const data = loadData();
+  const today = getTodayStr();
+  const key = `${noteHabitId}_${today}`;
+  if (!data.notes) data.notes = {};
+  const text = document.getElementById('noteText').value.trim();
+  if (text) data.notes[key] = text; else delete data.notes[key];
+  saveData(data); closeNoteModal();
+  showNotif('📝 Nota guardada', 'cyan');
+  checkAchievements(data); render();
+}
+
+// ─── XP ──────────────────────────────────────────────────────────────────────
+let lastLevel = 1;
+function addXP(data, amount) {
+  data.xp = (data.xp || 0) + amount;
+  const newLevel = Math.floor(data.xp / XP_PER_LEVEL) + 1;
+  if (newLevel > lastLevel) { lastLevel = newLevel; triggerLevelUp(newLevel); }
+  saveData(data);
+}
+function triggerLevelUp(lv) {
+  document.getElementById('newLevel').textContent = lv;
+  const overlay = document.getElementById('levelUp');
+  overlay.classList.add('show');
+  spawnParticles(); spawnParticles();
+  playSound('level');
+  overlay.onclick = () => overlay.classList.remove('show');
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────────────────────────
+let notifTimeout;
+function showNotif(msg, color = 'green') {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  const colors = { green: 'var(--green)', red: 'var(--red)', yellow: 'var(--yellow)', cyan: 'var(--cyan)' };
+  const c = colors[color] || 'var(--green)';
+  el.style.borderColor = c; el.style.color = c; el.style.boxShadow = `0 0 20px ${c}44`;
+  el.style.display = 'block';
+  clearTimeout(notifTimeout); notifTimeout = setTimeout(() => el.style.display = 'none', 3200);
+}
+
+// ─── PARTICLES ───────────────────────────────────────────────────────────────
+function spawnParticles() {
+  const canvas = document.getElementById('treeCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const colors = ['#00ff88','#ffdd00','#ff8800','#44aaff','#ff44aa','#bb44ff'];
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div'); p.className = 'particle';
+    const col = colors[Math.floor(Math.random()*colors.length)];
+    p.style.cssText = `background:${col};left:${rect.left+rect.width/2+(Math.random()-0.5)*80}px;top:${rect.top+rect.height/2+(Math.random()-0.5)*50}px;position:fixed;animation-delay:${Math.random()*0.4}s;box-shadow:0 0 4px ${col}`;
+    document.body.appendChild(p); setTimeout(() => p.remove(), 2200);
+  }
+}
+
+function spawnConfetti() {
+  const colors = ['#00ff88','#ffdd00','#ff8800','#ff44aa','#4488ff','#bb44ff','#00eeff','#ffffff'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div'); p.className = 'confetti-piece';
+    const col = colors[Math.floor(Math.random()*colors.length)];
+    p.style.cssText = `background:${col};left:${Math.random()*100}vw;top:-10px;animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*0.8}s;width:${4+Math.random()*6}px;height:${4+Math.random()*6}px;`;
+    document.body.appendChild(p); setTimeout(() => p.remove(), 3500);
+  }
+  playSound('perfect');
+}
+
+// ─── WEATHER ─────────────────────────────────────────────────────────────────
+function updateWeather(health) {
+  const fx = document.getElementById('weatherFx'); fx.innerHTML = '';
+  if (health < 40) {
+    for (let i = 0; i < 25; i++) {
+      const r = document.createElement('div'); r.className = 'raindrop';
+      r.style.cssText = `left:${Math.random()*100}%;height:${6+Math.random()*8}px;top:-10px;animation-duration:${0.5+Math.random()*0.4}s;animation-delay:${Math.random()*1.2}s`;
+      fx.appendChild(r);
+    }
+  } else if (health < 60) {
+    for (let i = 0; i < 10; i++) {
+      const r = document.createElement('div'); r.className = 'raindrop';
+      r.style.cssText = `left:${Math.random()*100}%;height:${4+Math.random()*5}px;top:-10px;animation-duration:${0.8+Math.random()*0.5}s;animation-delay:${Math.random()*2}s`;
+      fx.appendChild(r);
+    }
+  }
+}
+
+// ─── DRAW TREE ────────────────────────────────────────────────────────────────
+function drawTree(progress, health) {
+  const canvas = document.getElementById('treeCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const dead = health < 20, sick = health < 50;
+  canvas.classList.toggle('dead', dead);
+  const trunkColor = dead ? '#4a2a0a' : sick ? '#6a3a0f' : '#8B4513';
+  const darkTrunk  = dead ? '#2a1a05' : sick ? '#4a2a0a' : '#5C2D0A';
+  const leafColor  = dead ? '#4a4a2a' : sick ? '#6a7a1a' : '#2d8a1a';
+  const leafLight  = dead ? '#5a5a3a' : sick ? '#8a9a2a' : '#3daa2a';
+  const leafDark   = dead ? '#3a3a1a' : sick ? '#4a5a0a' : '#1a6a0a';
+  const px = 4;
+  const rect = (x,y,w,h,c) => { ctx.fillStyle = c; ctx.fillRect(x*px,y*px,w*px,h*px); };
+  const cx = W/2/px;
+
+  if (progress <= 5) {
+    rect(cx-1, 15, 2, 2, '#c8a060'); rect(cx-1, 14, 2, 1, '#a08040');
+    if (progress >= 3) rect(cx, 13, 1, 2, '#3daa2a');
+  } else if (progress <= 15) {
+    rect(cx, 12, 1, 4, '#4a7a1a'); rect(cx-2, 11, 2, 1, leafColor);
+    rect(cx+1, 11, 2, 1, leafColor); rect(cx, 10, 1, 1, leafLight); rect(cx-1, 15, 2, 1, '#c8a060');
+  } else if (progress <= 30) {
+    rect(cx, 13, 1, 3, trunkColor); rect(cx-1, 14, 1, 2, darkTrunk);
+    rect(cx-3, 11, 3, 1, trunkColor); rect(cx+1, 11, 3, 1, trunkColor);
+    rect(cx-4, 9, 3, 2, leafColor); rect(cx-3, 8, 2, 1, leafLight);
+    rect(cx+2, 9, 3, 2, leafColor); rect(cx+2, 8, 2, 1, leafLight);
+    rect(cx-1, 8, 3, 2, leafLight); rect(cx, 7, 1, 1, leafColor);
+  } else if (progress <= 55) {
+    for (let i=0;i<5;i++) { rect(cx-1,10+i,3,1,trunkColor); rect(cx-1,10+i,1,1,darkTrunk); }
+    rect(cx-5, 8, 4, 1, trunkColor); rect(cx+2, 8, 4, 1, trunkColor);
+    rect(cx-2, 6, 2, 1, trunkColor); rect(cx+1, 6, 2, 1, trunkColor);
+    for (let dy=0;dy<3;dy++) for (let dx=-5;dx<-1;dx++) if(Math.abs(dx+3)+dy<3) rect(cx+dx,5+dy,1,1,dy===0?leafLight:leafColor);
+    for (let dy=0;dy<3;dy++) for (let dx=2;dx<6;dx++) if(Math.abs(dx-4)+dy<3) rect(cx+dx,5+dy,1,1,dy===0?leafLight:leafColor);
+    rect(cx-2,3,5,3,leafColor); rect(cx-1,2,3,2,leafLight); rect(cx,1,1,1,leafLight);
+    rect(cx-2,5,1,1,leafDark); rect(cx+2,5,1,1,leafDark);
+  } else if (progress <= 80) {
+    for (let i=0;i<7;i++) { rect(cx-2,8+i,4,1,trunkColor); rect(cx-2,8+i,1,1,darkTrunk); }
+    rect(cx-4,14,2,1,darkTrunk); rect(cx+3,14,2,1,darkTrunk);
+    rect(cx-7,6,5,1,trunkColor); rect(cx+3,6,5,1,trunkColor);
+    rect(cx-3,4,2,1,trunkColor); rect(cx+2,4,2,1,trunkColor);
+    for (let dy=0;dy<8;dy++) {
+      const spread = Math.min(6,dy+1,8-dy);
+      for (let dx=-spread;dx<=spread;dx++) {
+        const dist = Math.abs(dx)+dy*0.5;
+        const c = dist<2?leafLight:dist<4?leafColor:leafDark;
+        if (dist<spread+0.5) rect(cx+dx,1+dy,1,1,c);
+      }
+    }
+    if (!sick) [[cx-3,2],[cx+2,2],[cx-5,5],[cx+4,5],[cx,0]].forEach(([fx,fy])=>rect(fx,fy,1,1,'#ff88aa'));
+  } else {
+    for (let i=0;i<9;i++) { rect(cx-3,6+i,6,1,trunkColor); rect(cx-3,6+i,2,1,darkTrunk); }
+    rect(cx-6,13,3,1,darkTrunk); rect(cx-5,14,2,1,darkTrunk);
+    rect(cx+4,13,3,1,darkTrunk); rect(cx+4,14,2,1,darkTrunk);
+    rect(cx-9,4,6,1,trunkColor); rect(cx+4,4,6,1,trunkColor);
+    rect(cx-5,2,3,1,trunkColor); rect(cx+3,2,3,1,trunkColor);
+    for (let dy=0;dy<12;dy++) {
+      const spread = Math.min(9,dy*1.2+1,12-dy+2);
+      for (let dx=-spread;dx<=spread;dx++) {
+        const dist = Math.abs(dx)*0.8+dy*0.4;
+        const c = dist<2?'#88ffaa':dist<5?leafLight:dist<7?leafColor:leafDark;
+        if (dist<spread+0.5) rect(cx+dx,-1+dy,1,1,c);
+      }
+    }
+    [[cx-4,0],[cx+3,0],[cx-7,4],[cx+6,4],[cx-2,-1],[cx+1,-1]].forEach(([fx,fy])=>{if(fy>=0)rect(fx,fy,1,1,'#ffee44');});
+    [[cx-3,1],[cx+2,1],[cx-6,4],[cx+5,4],[cx+0,2],[cx-8,6],[cx+7,6]].forEach(([fx,fy])=>{if(fy>=0)rect(fx,fy,1,1,'#ff88cc');});
+  }
+}
+
+// ─── HABIT LIST ──────────────────────────────────────────────────────────────
+let prevTodayPct = -1;
+function renderHabits(data) {
+  const today = getTodayStr();
+  const el = document.getElementById('habitsList');
+  if (!data.habits.length) {
+    el.innerHTML = '<div class="empty-state">🌰 SIN HÁBITOS AÚN<br>¡AGREGA UNO PARA<br>COMENZAR TU VIAJE!</div>';
+    return;
+  }
+  el.innerHTML = '';
+  data.habits.forEach(h => {
+    const active = shouldDoToday(h, today);
+    const done = h.log[today] === true;
+    const missed = h.log[today] === false;
+    let streak = 0;
+    let d = new Date(today + 'T12:00:00');
+    while (true) {
+      const ds = d.toISOString().split('T')[0];
+      if (h.log[ds] === true) { streak++; d.setDate(d.getDate()-1); } else break;
+    }
+    const hits = Object.values(h.log).filter(v => v === true).length;
+    const pct = Math.min(100, Math.round(hits / h.duration * 100));
+    const color = h.color || 'var(--green)';
+    const noteKey = `${h.id}_${today}`;
+    const hasNote = data.notes && data.notes[noteKey];
+
+    const div = document.createElement('div');
+    div.className = 'habit-item' + (done ? ' done' : missed ? ' failed' : (!active ? ' skipped' : ''));
+    div.innerHTML = `
+      <div class="habit-top">
+        <span class="habit-name">${h.icon} ${h.name.toUpperCase()}</span>
+        <div class="habit-actions">
+          <div class="habit-note-btn ${hasNote?'has-note':''}" onclick="openNoteModal(${h.id})" title="${hasNote?'Ver nota':'Agregar nota'}">📝</div>
+          <div class="habit-del" onclick="deleteHabit(${h.id})" title="Eliminar">✕</div>
+          <div class="habit-check" onclick="toggleHabit(${h.id})">${done ? '✓' : ''}</div>
+        </div>
+      </div>
+      <div class="habit-meta">
+        <span class="habit-streak">${streak > 0 ? '🔥 '+streak+'d racha' : (active ? '▷ Pendiente' : '— No toca hoy')}</span>
+        <span class="habit-freq">${pct}% · ${hits}/${h.duration}d</span>
+      </div>
+      <div class="mini-track"><div class="mini-fill" style="width:${pct}%;background:${color}"></div></div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function toggleHabit(id) {
+  const data = loadData(); const today = getTodayStr();
+  const h = data.habits.find(x => x.id === id); if (!h) return;
+  const was = h.log[today];
+  h.log[today] = was ? undefined : true;
+  if (h.log[today] === undefined) delete h.log[today];
+  if (h.log[today] === true) {
+    addXP(data, XP_PER_HABIT);
+    showNotif(`🌱 ¡${h.name} completado! +${XP_PER_HABIT} XP`, 'green');
+    spawnParticles(); playSound('check');
+    // check perfect day
+    const due = data.habits.filter(x => shouldDoToday(x, today));
+    const allDone = due.length > 0 && due.every(x => x.log[today] === true);
+    if (allDone) { setTimeout(() => { showNotif('💯 ¡DÍA PERFECTO! 🎉🎉', 'yellow'); spawnConfetti(); }, 400); }
+  } else {
+    saveData(data); showNotif(`↩ ${h.name} desmarcado`, 'red');
+  }
+  checkAchievements(data); saveData(data); render();
+}
+
+function deleteHabit(id) {
+  if (!confirm('¿Eliminar este hábito?')) return;
+  const data = loadData(); data.habits = data.habits.filter(x => x.id !== id);
+  saveData(data); showNotif('🗑 Hábito eliminado', 'red'); render();
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+function renderHistory(data) {
+  const el = document.getElementById('historyGrid'); el.innerHTML = '';
+  if (!data.habits.length) { el.innerHTML = '<div class="empty-state">Sin datos aún</div>'; return; }
+  const today = new Date();
+  data.habits.slice(0, 5).forEach(h => {
+    const row = document.createElement('div'); row.className = 'history-row';
+    row.innerHTML = `<div class="history-label">${h.icon} ${h.name.substring(0,16).toUpperCase()}</div>`;
+    const dots = document.createElement('div'); dots.className = 'history-dots';
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().split('T')[0];
+      const shouldDo = shouldDoToday(h, ds);
+      const dot = document.createElement('div');
+      if (!shouldDo) dot.className = 'dot skip';
+      else if (h.log[ds] === true) { dot.className = 'dot hit'; dot.style.background = h.color || 'var(--green2)'; }
+      else if (i === 0 && h.log[ds] === undefined) dot.className = 'dot future';
+      else dot.className = 'dot miss';
+      dot.title = d.toLocaleDateString('es');
+      dots.appendChild(dot);
+    }
+    row.appendChild(dots); el.appendChild(row);
+  });
+}
+
+function renderWeekly(data) {
+  const el = document.getElementById('weeklyGrid'); el.innerHTML = '';
+  if (!data.habits.length) { el.innerHTML = '<div class="empty-state">Sin datos aún</div>'; return; }
+  const days = ['L','M','X','J','V','S','D'];
+  const today = new Date();
+  const totals = Array(7).fill(0); const hits = Array(7).fill(0);
+  data.habits.forEach(h => {
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().split('T')[0]; const col = 6 - i;
+      if (shouldDoToday(h, ds)) { totals[col]++; if (h.log[ds] === true) hits[col]++; }
+    }
+  });
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;gap:4px;align-items:flex-end;height:70px;padding-top:4px';
+  days.forEach((day, i) => {
+    const pct = totals[i] > 0 ? Math.round(hits[i]/totals[i]*100) : 0;
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px';
+    const bar = document.createElement('div');
+    bar.style.cssText = `flex:1;width:100%;background:#07071a;border:1px solid var(--border);display:flex;align-items:flex-end`;
+    const fill = document.createElement('div');
+    fill.style.cssText = `width:100%;height:${pct}%;background:${pct>66?'var(--green)':pct>33?'var(--yellow)':'var(--orange)'};transition:height 0.5s`;
+    bar.appendChild(fill);
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:10px;color:var(--gray2);font-family:VT323,monospace'; label.textContent = day;
+    col.appendChild(bar); col.appendChild(label); wrap.appendChild(col);
+  });
+  el.appendChild(wrap);
+}
+
+// ─── BOSS DEL DÍA ─────────────────────────────────────────────────────────────
+function renderBoss(data) {
+  const box = document.getElementById('bossBox');
+  const today = getTodayStr();
+  // Pick consistent boss for the day
+  const dayIdx = Math.floor(new Date(today).getTime() / 86400000) % BOSS_CHALLENGES.length;
+  const boss = BOSS_CHALLENGES[dayIdx];
+  const done = data.bossDate === today && data.bossDone;
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div class="boss-box ${done?'boss-done':''}">
+      <div class="boss-title">⚔️ BOSS DEL DÍA ${done?'— DERROTADO ✓':''}</div>
+      <div class="boss-desc">${boss.text}</div>
+      ${!done ? `<button class="pixel-btn sm" style="width:auto" onclick="completeBoss()">✓ COMPLETADO! +${boss.xp} XP</button>` : `<span style="font-family:'VT323',monospace;font-size:13px;color:var(--green)">+${boss.xp} XP obtenidos 🏆</span>`}
+    </div>
+  `;
+}
+
+function completeBoss() {
+  const data = loadData(); const today = getTodayStr();
+  const dayIdx = Math.floor(new Date(today).getTime() / 86400000) % BOSS_CHALLENGES.length;
+  const boss = BOSS_CHALLENGES[dayIdx];
+  data.bossDate = today; data.bossDone = true;
+  addXP(data, boss.xp); saveData(data);
+  showNotif(`⚔️ ¡BOSS DERROTADO! +${boss.xp} XP 🏆`, 'yellow');
+  playSound('achieve'); spawnParticles(); render();
+}
+
+// ─── STATS PAGE ───────────────────────────────────────────────────────────────
+function renderStatsPage(data) {
+  const stats = computeStats(data);
+  const today = getTodayStr();
+  const start = getStartDate(data);
+  const totalDays = daysDiff(start, today) + 1;
+  let totalHits = 0;
+  data.habits.forEach(h => { totalHits += Object.values(h.log).filter(v=>v===true).length; });
+
+  // Cards
+  const cards = document.getElementById('statsCards');
+  cards.innerHTML = `
+    <div class="stat-card"><div class="big-num">${stats.streak}</div><div class="label">RACHA ACTUAL</div></div>
+    <div class="stat-card"><div class="big-num">${totalHits}</div><div class="label">TOTAL COMPLETADOS</div></div>
+    <div class="stat-card"><div class="big-num">${stats.level}</div><div class="label">NIVEL ACTUAL</div></div>
+    <div class="stat-card"><div class="big-num">${totalDays}</div><div class="label">DÍAS ACTIVO</div></div>
+  `;
+
+  // Day of week analysis (last 4 weeks)
+  const dayNames = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+  const dayTotals = Array(7).fill(0); const dayHits = Array(7).fill(0);
+  for (let i = 0; i < 28; i++) {
+    const d = new Date(today + 'T12:00:00'); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0]; const dow = d.getDay();
+    data.habits.forEach(h => {
+      if (shouldDoToday(h, ds)) { dayTotals[dow]++; if (h.log[ds]===true) dayHits[dow]++; }
+    });
+  }
+  const dayPcts = dayTotals.map((t, i) => t > 0 ? Math.round(dayHits[i]/t*100) : 0);
+  const barsEl = document.getElementById('dayBars'); barsEl.innerHTML = '';
+  dayPcts.forEach((pct, i) => {
+    const col = document.createElement('div'); col.className = 'day-col';
+    const bw = document.createElement('div'); bw.className = 'day-bar-wrap';
+    const bf = document.createElement('div'); bf.className = 'day-bar-fill';
+    bf.style.cssText = `height:${pct}%;background:${pct>66?'var(--green)':pct>33?'var(--yellow)':'var(--orange)'}`;
+    bw.appendChild(bf);
+    const dl = document.createElement('div'); dl.className = 'day-label'; dl.textContent = dayNames[i];
+    const dp = document.createElement('div'); dp.className = 'day-pct'; dp.style.color = 'var(--gray2)'; dp.textContent = pct + '%';
+    col.appendChild(bw); col.appendChild(dl); col.appendChild(dp);
+    barsEl.appendChild(col);
+  });
+  const bestIdx = dayPcts.indexOf(Math.max(...dayPcts));
+  const bestEl = document.getElementById('bestDayNote');
+  if (Math.max(...dayPcts) > 0) {
+    bestEl.textContent = `🏆 Tu mejor día: ${dayNames[bestIdx]} con ${dayPcts[bestIdx]}% de cumplimiento`;
+  }
+
+  // Full history
+  const fhg = document.getElementById('fullHistoryGrid'); fhg.innerHTML = '';
+  if (!data.habits.length) { fhg.innerHTML = '<div class="empty-state">Sin datos aún</div>'; return; }
+  const todayD = new Date();
+  data.habits.forEach(h => {
+    const row = document.createElement('div'); row.className = 'history-row';
+    row.innerHTML = `<div class="history-label">${h.icon} ${h.name.substring(0,20).toUpperCase()}</div>`;
+    const dots = document.createElement('div'); dots.className = 'history-dots';
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(todayD); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().split('T')[0];
+      const shouldDo = shouldDoToday(h, ds);
+      const dot = document.createElement('div');
+      if (!shouldDo) dot.className = 'dot skip';
+      else if (h.log[ds] === true) { dot.className = 'dot hit'; dot.style.background = h.color || 'var(--green2)'; }
+      else if (i === 0 && h.log[ds] === undefined) dot.className = 'dot future';
+      else dot.className = 'dot miss';
+      dot.title = d.toLocaleDateString('es') + ' — ' + (h.log[ds]===true ? '✓' : shouldDo ? '✗' : '—');
+      dots.appendChild(dot);
+    }
+    row.appendChild(dots); fhg.appendChild(row);
+  });
+}
+
+// ─── CALENDAR ─────────────────────────────────────────────────────────────────
+let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+const CAL_MONTHS = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+
+function renderCalendar() {
+  const data = loadData();
+  const today = getTodayStr();
+  document.getElementById('calMonth').textContent = `${CAL_MONTHS[calMonth]} ${calYear}`;
+  const grid = document.getElementById('calGrid'); grid.innerHTML = '';
+  const dayLabels = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+  dayLabels.forEach(dl => {
+    const h = document.createElement('div'); h.className = 'cal-header'; h.textContent = dl; grid.appendChild(h);
+  });
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  for (let i = 0; i < firstDay; i++) {
+    const e = document.createElement('div'); e.className = 'cal-day empty'; grid.appendChild(e);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const ds = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const el = document.createElement('div'); el.className = 'cal-day';
+    el.textContent = day;
+    if (ds === today) el.classList.add('today');
+    if (data.habits.length) {
+      const due = data.habits.filter(h => shouldDoToday(h, ds));
+      if (due.length) {
+        const done = due.filter(h => h.log[ds] === true).length;
+        const pct = done / due.length;
+        if (pct === 1) el.classList.add('perfect');
+        else if (pct > 0) el.classList.add('partial');
+        else if (ds < today) el.classList.add('miss');
+      }
+    }
+    grid.appendChild(el);
+  }
+}
+function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+// ─── EXPORT / IMPORT ─────────────────────────────────────────────────────────
+function exportData() {
+  const data = loadData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = `arbol-habitos-${getTodayStr()}.json`; a.click();
+  URL.revokeObjectURL(url);
+  showNotif('💾 Datos exportados!', 'cyan');
+}
+function importData(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.habits) { localStorage.setItem('habitTree3', JSON.stringify(d)); render(); showNotif('✅ Datos importados!', 'green'); }
+      else showNotif('⚠ Archivo inválido', 'red');
+    } catch(err) { showNotif('⚠ Error al leer el archivo', 'red'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ─── THEME ───────────────────────────────────────────────────────────────────
+function setTheme(theme, btn) {
+  document.body.className = theme !== 'green' ? `theme-${theme}` : '';
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const data = loadData(); data.theme = theme; saveData(data);
+}
+function loadTheme() {
+  const data = loadData();
+  const theme = data.theme || 'green';
+  document.body.className = theme !== 'green' ? `theme-${theme}` : '';
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(theme === 'green' ? 'verde' : theme === 'blue' ? 'azul' : theme === 'red' ? 'rojo' : 'dorado')) {
+      b.classList.add('active');
+    }
+  });
+  soundEnabled = data.soundEnabled !== false;
+  document.getElementById('soundToggle').textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
+}
+
+// ─── BROWSER NOTIFICATIONS ───────────────────────────────────────────────────
+let reminderInterval = null;
+function saveReminder() {
+  const time = document.getElementById('reminderTime').value;
+  if (!time) return;
+  const data = loadData(); data.reminderTime = time; saveData(data);
+  setupReminder(time);
+  showNotif(`🔔 Recordatorio: ${time} cada día`, 'cyan');
+  document.getElementById('reminderStatus').textContent = `✓ Recordatorio activo: ${time}`;
+}
+function setupReminder(time) {
+  if (reminderInterval) clearInterval(reminderInterval);
+  if (!time) return;
+  if (Notification && Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => {
+      document.getElementById('reminderStatus').textContent = p === 'granted' ? `✓ Recordatorio activo: ${time}` : '⚠ Permisos denegados. Habilita en el navegador.';
+    });
+  }
+  reminderInterval = setInterval(() => {
+    const now = new Date();
+    const nowStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    if (nowStr === time) {
+      const data = loadData();
+      const today = getTodayStr();
+      const due = data.habits.filter(h => shouldDoToday(h, today));
+      const done = due.filter(h => h.log[today] === true).length;
+      if (Notification && Notification.permission === 'granted') {
+        new Notification('🌱 Árbol de Hábitos', {
+          body: `¡Hora de tus hábitos! ${done}/${due.length} completados hoy.`,
+          icon: 'data:image/png;base64,iVBORw0KGgo='
+        });
+      }
+    }
+  }, 60000);
+}
+function testReminder() {
+  if (Notification && Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') sendTestNotif();
+      else document.getElementById('reminderStatus').textContent = '⚠ Permisos denegados. Habilita en el navegador.';
+    });
+  } else { sendTestNotif(); }
+}
+function sendTestNotif() {
+  if (Notification && Notification.permission === 'granted') {
+    new Notification('🌱 Árbol de Hábitos', { body: '¡Recordatorio de prueba! Tus hábitos te esperan.' });
+    showNotif('🔔 Notificación enviada!', 'cyan');
+  } else {
+    showNotif('⚠ Activa permisos en el navegador', 'red');
+  }
+}
+
+// ─── MAIN NAV TABS ─────────────────────────────────────────────────────────────
+function switchMainTab(id, btn) {
+  document.querySelectorAll('.mnav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.main-page').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-' + id).classList.add('active');
+  if (id === 'stats') { const data = loadData(); renderStatsPage(data); }
+  if (id === 'calendar') renderCalendar();
+}
+
+// ─── INNER TABS ──────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ─── MAIN RENDER ─────────────────────────────────────────────────────────────
+function render() {
+  const data = loadData();
+  const { stage, progress, health } = renderStage(data);
+  renderHabits(data);
+  renderHistory(data);
+  renderWeekly(data);
+  renderStats(data);
+  renderBoss(data);
+  drawTree(progress, health);
+  updateWeather(health);
+  updateSky();
+  checkAchievements(data);
+  updateNameDisplay();
+  const stats = computeStats(data);
+  lastLevel = stats.level;
+}
+
+// ─── MIDNIGHT TICK ────────────────────────────────────────────────────────────
+function scheduleLogClose() {
+  const now = new Date(); const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  setTimeout(() => {
+    const data = loadData(); const today = getTodayStr();
+    data.habits.forEach(h => { if (shouldDoToday(h, today) && h.log[today] === undefined) h.log[today] = false; });
+    saveData(data); render(); scheduleLogClose();
+  }, midnight - now);
+}
+scheduleLogClose();
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadTheme();
+render();
+setInterval(render, 60000);
+
+// Load reminder if set
+(function() {
+  const data = loadData();
+  if (data.reminderTime) {
+    document.getElementById('reminderTime').value = data.reminderTime;
+    document.getElementById('reminderStatus').textContent = `✓ Recordatorio activo: ${data.reminderTime}`;
+    setupReminder(data.reminderTime);
+  }
+  if (!data.playerName) setTimeout(() => openNameModal(), 800);
+})();
+</script>
+</body>
+</html>
